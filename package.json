@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/felipesdias/ping-monitor#readme",
   "dependencies": {
+    "default-gateway": "^6.0.3",
     "picocolors": "^1.1.1",
     "ping": "^1.0.0"
   }
