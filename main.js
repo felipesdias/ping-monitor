@@ -23,7 +23,7 @@ function getRouterIp() {
         const { gateway } = defaultGateway.v4.sync();
         return gateway;
     } catch (err) {
-        console.error(pc.yellow(`Aviso: não foi possível obter o IP do roteador (${err.message})`));
+        console.error(pc.yellow(`Warning: could not detect router IP (${err.message})`));
         return null;
     }
 }
@@ -31,11 +31,11 @@ function getRouterIp() {
 function getDnsIp() {
     try {
         const servers = dns.getServers();
-        // Prioriza um servidor IPv4 não-loopback; cai no primeiro disponível.
+        // Prefer a non-loopback IPv4 server; fall back to the first available.
         const ipv4 = servers.find(s => !s.includes(':') && !s.startsWith('127.'));
         return ipv4 || servers[0] || null;
     } catch (err) {
-        console.error(pc.yellow(`Aviso: não foi possível obter o IP do DNS (${err.message})`));
+        console.error(pc.yellow(`Warning: could not detect DNS IP (${err.message})`));
         return null;
     }
 }
@@ -57,7 +57,7 @@ const targets = rawArgs.length === 0
     : rawArgs.map(arg => ({ label: arg, host: parseTarget(arg) }));
 
 if (targets.length === 0) {
-    console.error(pc.red('Erro: nenhum alvo disponível para monitorar.'));
+    console.error(pc.red('Error: no targets available to monitor.'));
     process.exit(1);
 }
 
@@ -96,16 +96,16 @@ async function monitor() {
 
     console.log(consoleLine);
     fs.appendFile(LOG_FILE, logLine, (err) => {
-        if (err) console.error(pc.bgRed(pc.white(` Erro ao escrever no log: ${err.message} `)));
+        if (err) console.error(pc.bgRed(pc.white(` Failed to write log: ${err.message} `)));
     });
 }
 
-console.log(pc.cyan('Iniciando monitoramento. Pressione Ctrl+C para parar.'));
+console.log(pc.cyan('Starting monitoring. Press Ctrl+C to stop.'));
 if (rawArgs.length === 0) {
-    console.log(pc.cyan('Modo padrão: roteador, DNS e google.com'));
+    console.log(pc.cyan('Default mode: router, DNS and google.com'));
 }
-console.log(pc.cyan('Alvos: ') + targets.map(t => `${t.label}=${t.host}`).join(', '));
-console.log(pc.cyan(`Arquivo de log: ${LOG_FILE}`));
+console.log(pc.cyan('Targets: ') + targets.map(t => `${t.label}=${t.host}`).join(', '));
+console.log(pc.cyan(`Log file: ${LOG_FILE}`));
 
 monitor();
 setInterval(monitor, INTERVAL_MS);
